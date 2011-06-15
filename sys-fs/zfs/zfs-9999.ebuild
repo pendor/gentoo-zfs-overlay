@@ -7,7 +7,7 @@ EAPI="2"
 WANT_AUTOMAKE="1.11"
 AT_M4DIR=./config  # for aclocal called by eautoreconf
 
-EGIT_REPO_URI="http://github.com/behlendorf/zfs.git"
+EGIT_REPO_URI="http://github.com/pendor/zfs.git"
 
 inherit autotools eutils git-2 linux-mod
 
@@ -41,7 +41,6 @@ pkg_setup() {
 
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
-	epatch "${FILESDIR}"/zfs-eprefix.patch
 	eautoreconf
 }
 
