@@ -36,7 +36,7 @@ Unmask packages:
 
 Install:
 
-	emerge -vp =sys-devel/spl-9999 =sys-fs/zfs-9999 =sys-kernel-genkernel-9999
+	emerge -vp =sys-devel/spl-9999 =sys-fs/zfs-9999 =sys-kernel/genkernel-9999
 
 Enable ZFS support in genkernel:
 
