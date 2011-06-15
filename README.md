@@ -10,38 +10,48 @@ Using this overlay
 
 Please be aware that the following instructions assume a certain level of expertise using Portage and Genkernel.  Before running these commands, you should at a bare minimum backup your existing kernel & initramfs and create failsafe entries in your grub.conf to use those backups for when things fail miserably.
 
-This is (at best) experimental code, and it can easily leave your system in an unbootable state.  Have a LiveCD standing by...
+> This is (at best) experimental code, and it can easily leave your system in an unbootable state.  Have a LiveCD standing by...
 
 Edit /etc/layman/layman.cfg.  Add under the overlays line:
-    https://raw.github.com/pendor/gentoo-zfs-overlay/master/overlay.xml
+
+	https://raw.github.com/pendor/gentoo-zfs-overlay/master/overlay.xml
 
 Fetch remote overlays:
-    layman -f
+
+	layman -f
 
 Add the ZFS overlay:
-    layman -a zfs
+
+	layman -a zfs
 
 Keep the overlay up to date from git:
-    layman -s zfs
+
+	layman -s zfs
 
 Unmask packages:
-    echo "sys-devel/spl **" >> /etc/portage/package.keywords
-    echo "sys-fs/zfs **" >> /etc/portage/package.keywords
-    echo "sys-kernel/genkernel **" >> /etc/portage/package.keywords
+
+	echo "sys-devel/spl **" >> /etc/portage/package.keywords
+	echo "sys-fs/zfs **" >> /etc/portage/package.keywords
+	echo "sys-kernel/genkernel **" >> /etc/portage/package.keywords
 
 Install:
-    emerge -vp =sys-devel/spl-9999 =sys-fs/zfs-9999 =sys-kernel-genkernel-9999
+
+	emerge -vp =sys-devel/spl-9999 =sys-fs/zfs-9999 =sys-kernel-genkernel-9999
 
 Enable ZFS support in genkernel:
-    echo 'ZFS="yes"' >> /etc/genkernel.conf
+
+	echo 'ZFS="yes"' >> /etc/genkernel.conf
 
 Build it:
-    genkernel all
+
+	genkernel all
 
 Enable ZFS at boot:
-    Add 'dozfs' to your kernel command line in grub.conf
+
+	Add 'dozfs' to your kernel command line in grub.conf
 
 The first discovered zpool with a bootfs attribute set will have that FS mounted as root.  You should omit the real_root parameter to allow auto-detection.
 
 If manual configuration of root is preferred over auto based on zpool properties, then set something like:
-    real_root=ZFS=rpool/ROOT
+
+	real_root=ZFS=rpool/ROOT
