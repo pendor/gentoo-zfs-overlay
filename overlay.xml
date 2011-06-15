@@ -9,7 +9,7 @@
       <email>zac@thebedells.org</email>
       <name>Zachary Bedell</name>
     </owner>
-    <source type="git">git://github.com/pendor/gentoo-zfs-overlay.git</source>
+    <source type="git">git://github.com/pendor/gentoo-zfs-overlay.git/overlay</source>
     <feed>https://github.com/pendor/gentoo-zfs-overlay/commits/master.atom</feed>
   </repo>
 </repositories>
