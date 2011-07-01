@@ -40,7 +40,7 @@ COMMON_URI="${DM_HOME}/dmraid-${VERSION_DMRAID}.tar.bz2
 if [[ ${PV} == 9999* ]]
 then
 	EGIT_REPO_URI="git://github.com/pendor/genkernel-zfs.git"
-	EGIT_BRANCH=master
+	EGIT_BRANCH=dracut
 	inherit git bash-completion eutils
 	S="${WORKDIR}/${PN}"
 	SRC_URI="${COMMON_URI}"
