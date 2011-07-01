@@ -11,7 +11,7 @@ inherit git-2 linux-info eutils autotools
 DESCRIPTION="Solaris Porting Layer - a Linux kernel module providing some Solaris kernel APIs"
 HOMEPAGE="http://wiki.github.com/behlendorf/spl/"
 SRC_URI=""
-EGIT_REPO_URI="git://github.com/pendor/spl.git"
+EGIT_REPO_URI="git://github.com/behlendorf/spl.git"
 
 LICENSE="|| ( GPL-2 GPL-3 )"
 SLOT="0"
