@@ -65,6 +65,8 @@ src_install() {
 	# Drop unwanted files
 	rm -rf "${D}/usr/src" || die "removing unwanted files die"
 	
+	[ -f /etc/hostid ] || hostid > /etc/hostid
+	
 	# Can't install static libs or libtool files
 	find "${D}" -name \*.la -delete
 	find "${D}" -name \*.a -delete
