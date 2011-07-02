@@ -67,6 +67,11 @@ src_install() {
 	# Drop unwanted files
 	rm -rf "${D}/usr/src" || die "removing unwanted files die"
 	
+	# This is kind of messy, but we have our dracut modules, and genkernel
+	# will need them later.
+	insinto /usr/share/genkernel/modules
+	doins -r dracut/90zfs
+	
 	# Can't install static libs or libtool files
 	find "${D}" -name \*.la -delete
 	find "${D}" -name \*.a -delete
@@ -83,9 +88,10 @@ pkg_postinst() {
     elog "used by ZFS to determine if a pool being considered for import was last"
     elog "used by the current host.  Non-exported pools can only be imported if"
     elog "the pool's last hostid matches that of the current host."
-    
+    ewarn " "
     ewarn "Changing or deleting /etc/hostid after creating ZFS pools may leave"
     ewarn "pools un-importable or cause the system to fail to boot."
+    ewarn " "
   fi
 }
 
