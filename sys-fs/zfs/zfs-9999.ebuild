@@ -67,10 +67,12 @@ src_install() {
 	# Drop unwanted files
 	rm -rf "${D}/usr/src" || die "removing unwanted files die"
 	
-	# This is kind of messy, but we have our dracut modules, and genkernel
-	# will need them later.
-	insinto /usr/share/genkernel/modules
-	doins -r dracut/90zfs
+	# We have our dracut modules, but they're not installed where genkernel
+	# will need them later.  Move them over & try to clean up empty directories.
+	mkdir -p ${D}/usr/share/genkernel/modules
+	mv ${D}/usr/share/dracut/modules.d/90zfs ${D}/usr/share/genkernel/modules/
+	rmdir ${D}/usr/share/dracut/modules.d || true
+	rmdir ${D}/usr/share/dracut || true
 	
 	# Can't install static libs or libtool files
 	find "${D}" -name \*.la -delete
