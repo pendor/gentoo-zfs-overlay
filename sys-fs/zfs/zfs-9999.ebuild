@@ -28,6 +28,8 @@ RDEPEND="
 		!sys-fs/zfs-fuse
 		"
 
+RESTRICT="bindist"
+
 pkg_setup() {
 	linux-mod_pkg_setup
 	kernel_is gt 2 6 32 || die "Your kernel is too old. ${CATEGORY}/${PN} need 2.6.32 or newer."
@@ -65,9 +67,25 @@ src_install() {
 	# Drop unwanted files
 	rm -rf "${D}/usr/src" || die "removing unwanted files die"
 	
-	[ -f /etc/hostid ] || hostid > /etc/hostid
-	
 	# Can't install static libs or libtool files
 	find "${D}" -name \*.la -delete
 	find "${D}" -name \*.a -delete
 }
+
+pkg_postinst() {
+  # Create write the hostid only if it doesn't exist.
+  # This is done outside of packaging since we don't want it
+  # deleted on remerge/upgrades.
+  if [ ! -f /etc/hostid ] ; then
+    hostid > /etc/hostid
+    
+    elog "A new /etc/hostid file has been created.  This file provides the hostid"
+    elog "used by ZFS to determine if a pool being considered for import was last"
+    elog "used by the current host.  Non-exported pools can only be imported if"
+    elog "the pool's last hostid matches that of the current host."
+    
+    ewarn "Changing or deleting /etc/hostid after creating ZFS pools may leave"
+    ewarn "pools un-importable or cause the system to fail to boot."
+  fi
+}
+
