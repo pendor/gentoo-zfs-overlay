@@ -7,12 +7,12 @@ EAPI="2"
 WANT_AUTOMAKE="1.11"
 AT_M4DIR=./config  # for aclocal called by eautoreconf
 
-EGIT_REPO_URI="http://github.com/pendor/zfs.git"
+EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
 
 inherit autotools eutils git-2 linux-mod
 
 DESCRIPTION="Native ZFS for Linux"
-HOMEPAGE="http://wiki.github.com/behlendorf/zfs/"
+HOMEPAGE="http://zfsonlinux.org/"
 SRC_URI=""
 
 LICENSE="CDDL GPL-2"

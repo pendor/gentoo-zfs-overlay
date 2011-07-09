@@ -9,9 +9,9 @@ AT_M4DIR=./config  # for aclocal called by eautoreconf
 inherit git-2 linux-info eutils autotools
 
 DESCRIPTION="Solaris Porting Layer - a Linux kernel module providing some Solaris kernel APIs"
-HOMEPAGE="http://wiki.github.com/behlendorf/spl/"
+HOMEPAGE="http://zfsonlinux.org/"
 SRC_URI=""
-EGIT_REPO_URI="git://github.com/behlendorf/spl.git"
+EGIT_REPO_URI="https://github.com/zfsonlinux/spl.git"
 
 LICENSE="|| ( GPL-2 GPL-3 )"
 SLOT="0"
