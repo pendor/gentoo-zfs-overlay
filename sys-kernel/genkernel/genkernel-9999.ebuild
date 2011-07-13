@@ -65,7 +65,7 @@ IUSE="ibm selinux zfs"
 
 DEPEND="sys-fs/e2fsprogs
 	selinux? ( sys-libs/libselinux )
-	zfs? ( =sys-devel/spl-9999 =sys-fs/zfs-9999 )"
+	zfs? ( >=sys-devel/spl-0.6.0_rc5 >=sys-fs/zfs-0.6.0_rc5 )"
 RDEPEND="${DEPEND} app-arch/cpio sys-kernel/dracut"
 
 if [[ ${PV} == 9999* ]]; then
