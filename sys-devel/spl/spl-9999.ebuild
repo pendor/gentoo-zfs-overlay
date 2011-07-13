@@ -34,15 +34,15 @@ src_unpack() {
   if [[ ${PV} == 9999* ]] ; then
     git_src_unpack
   else
-    unpack ${P}.tar.gz
+    unpack ${P/_rc/-rc}.tar.gz
+    cd ${WORKDIR}
+    mv ${P/_rc/-rc} ${P}
   fi
 }
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
-	if [[ ${PV} == 9999* ]] ; then
-	  eautoreconf
-	fi
+  epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
+  eautoreconf
 }
 
 src_configure() {

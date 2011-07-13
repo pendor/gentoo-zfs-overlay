@@ -30,7 +30,7 @@ if [[ ${PV} == 9999* ]] ; then
   EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
   inherit autotools eutils git-2 linux-mod
 else
-  inherit autotools eutils linux-mod
+  inherit eutils linux-mod autotools
   SRC_URI="mirror://gentoo/${P/_rc/-rc}.tar.gz
                   https://github.com/downloads/zfsonlinux/zfs/${P/_rc/-rc}.tar.gz"
 fi
@@ -39,7 +39,9 @@ src_unpack() {
   if [[ ${PV} == 9999* ]] ; then
     git_src_unpack
   else
-    unpack ${P}.tar.gz
+    unpack ${P/_rc/-rc}.tar.gz
+    cd ${WORKDIR}
+    mv ${P/_rc/-rc} ${P}
   fi
 }
 
@@ -60,10 +62,8 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
-	if [[ ${PV} == 9999* ]] ; then
-	  eautoreconf
-	fi
+  epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
+  eautoreconf
 }
 
 src_configure() {
