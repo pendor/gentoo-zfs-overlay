@@ -13,7 +13,7 @@ inherit mount-boot eutils flag-o-matic toolchain-funcs autotools
 
 MY_P=${P/_rc99/}
 SRC_URI="http://ftp.gnu.org/gnu/${PN}/${MY_P}.tar.gz
-        mirror://gentoo/${MY_P}.tar.gz"
+				mirror://gentoo/${MY_P}.tar.gz"
 S=${WORKDIR}/${MY_P}
 
 DESCRIPTION="GNU GRUB boot loader"
@@ -31,25 +31,23 @@ RDEPEND=">=sys-libs/ncurses-5.2-r5
 	)
 	device-mapper? ( >=sys-fs/lvm2-2.02.45 )
 	truetype? ( media-libs/freetype >=media-fonts/unifont-5 )
-	zfs? ( >=sys-devel/spl-0.6.0_rc5 >=sys-fs/zfs-0.6.0_rc5 )
-	>=sys-devel/autogen-5.10 sys-apps/help2man"
+	zfs? ( >=sys-devel/spl-0.6.0_rc5 >=sys-fs/zfs-0.6.0_rc5 )"
 
 DEPEND="${RDEPEND}
-	>=dev-lang/python-2.5.2"
+	>=dev-lang/python-2.5.2 >=sys-devel/autogen-5.10 sys-apps/help2man"
 
 export STRIP_MASK="*/grub/*/*.mod"
 QA_EXECSTACK="sbin/grub-probe sbin/grub-setup sbin/grub-mkdevicemap bin/grub-script-check bin/grub-fstest"
 
 src_prepare() {
 	epatch_user
-	
+
 	epatch "${FILESDIR}"/${PN}-1.99-zfs.patch
 
 	# autogen.sh does more than just run autotools
 	# need to eautomake due to weirdness #296013
 	sed -i -e '/^autoreconf/s:^:set +e; e:' autogen.sh || die
 	(. ./autogen.sh) || die
-
 
 	# install into the right dir for eselect #372735
 	sed -i \

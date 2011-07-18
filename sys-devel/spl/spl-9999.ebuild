@@ -21,28 +21,28 @@ DEPEND="
 RDEPEND=""
 
 if [[ ${PV} == 9999* ]] ; then
-  SRC_URI=""
-  EGIT_REPO_URI="https://github.com/zfsonlinux/spl.git"
-  inherit git-2 linux-info eutils autotools
+	SRC_URI=""
+	EGIT_REPO_URI="https://github.com/zfsonlinux/spl.git"
+	inherit git-2 linux-info eutils autotools
 else
-  inherit linux-info eutils autotools
-  SRC_URI="mirror://gentoo/${P/_rc/-rc}.tar.gz
-                  https://github.com/downloads/zfsonlinux/spl/${P/_rc/-rc}.tar.gz"
+	MY_P=${P/_rc/-rc}
+	inherit linux-info eutils autotools
+	SRC_URI="mirror://gentoo/${MY_P}.tar.gz
+									https://github.com/downloads/zfsonlinux/spl/${MY_P}.tar.gz"
+	S=${WORKDIR}/${MY_P}
 fi
 
 src_unpack() {
-  if [[ ${PV} == 9999* ]] ; then
-    git_src_unpack
-  else
-    unpack ${P/_rc/-rc}.tar.gz
-    cd ${WORKDIR}
-    mv ${P/_rc/-rc} ${P}
-  fi
+	if [[ ${PV} == 9999* ]] ; then
+		git_src_unpack
+	else
+		unpack ${MY_P}.tar.gz
+	fi
 }
 
 src_prepare() {
-  epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
-  eautoreconf
+	epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
+	eautoreconf
 }
 
 src_configure() {

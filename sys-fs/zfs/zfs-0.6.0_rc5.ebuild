@@ -26,23 +26,23 @@ RDEPEND="
 RESTRICT="bindist"
 
 if [[ ${PV} == 9999* ]] ; then
-  SRC_URI=""
-  EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
-  inherit autotools eutils git-2 linux-mod
+	SRC_URI=""
+	EGIT_REPO_URI="https://github.com/zfsonlinux/zfs.git"
+	inherit autotools eutils git-2 linux-mod
 else
 	MY_P=${P/_rc/-rc}
-  inherit eutils linux-mod autotools
-  SRC_URI="mirror://gentoo/${MY_P}.tar.gz
-                  https://github.com/downloads/zfsonlinux/zfs/${MY_P}.tar.gz"
+	inherit eutils linux-mod autotools
+	SRC_URI="mirror://gentoo/${MY_P}.tar.gz
+									https://github.com/downloads/zfsonlinux/zfs/${MY_P}.tar.gz"
 	S=${WORKDIR}/${MY_P}
 fi
 
 src_unpack() {
-  if [[ ${PV} == 9999* ]] ; then
-    git_src_unpack
-  else
-    unpack ${MY_P}.tar.gz
-  fi
+	if [[ ${PV} == 9999* ]] ; then
+		git_src_unpack
+	else
+		unpack ${MY_P}.tar.gz
+	fi
 }
 
 pkg_setup() {
@@ -54,16 +54,16 @@ pkg_setup() {
 		eerror "Please look at bug https://github.com/zfsonlinux/zfs/issues/83"
 		die "PREEMPT kernel"
 	fi
-	
+
 	if ! linux_chkconfig_present KALLSYMS; then
-	  eerror "${CATEGORY}/${PN} requires KALLSYMS enabled in the kernel."
-	  die "KALLSYMS kernel"
+		eerror "${CATEGORY}/${PN} requires KALLSYMS enabled in the kernel."
+		die "KALLSYMS kernel"
 	fi
 }
 
 src_prepare() {
-  epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
-  eautoreconf
+	epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
+	eautoreconf
 }
 
 src_configure() {
@@ -86,27 +86,26 @@ src_install() {
 	emake DESTDIR="${D}" install || die 'emake install failed'
 	# Drop unwanted files
 	rm -rf "${D}/usr/src" || die "removing unwanted files die"
-	
+
 	# Can't install static libs or libtool files
 	find "${D}" -name \*.la -delete
 	find "${D}" -name \*.a -delete
 }
 
 pkg_postinst() {
-  # Create write the hostid only if it doesn't exist.
-  # This is done outside of packaging since we don't want it
-  # deleted on remerge/upgrades.
-  if [ ! -f /etc/hostid ] ; then
-    hostid > /etc/hostid
-    
-    elog "A new /etc/hostid file has been created.  This file provides the hostid"
-    elog "used by ZFS to determine if a pool being considered for import was last"
-    elog "used by the current host.  Non-exported pools can only be imported if"
-    elog "the pool's last hostid matches that of the current host."
-    ewarn " "
-    ewarn "Changing or deleting /etc/hostid after creating ZFS pools may leave"
-    ewarn "pools un-importable or cause the system to fail to boot."
-    ewarn " "
-  fi
-}
+	# Create write the hostid only if it doesn't exist.
+	# This is done outside of packaging since we don't want it
+	# deleted on remerge/upgrades.
+	if [ ! -f /etc/hostid ] ; then
+		hostid > /etc/hostid
 
+		elog "A new /etc/hostid file has been created.  This file provides the hostid"
+		elog "used by ZFS to determine if a pool being considered for import was last"
+		elog "used by the current host.  Non-exported pools can only be imported if"
+		elog "the pool's last hostid matches that of the current host."
+		ewarn " "
+		ewarn "Changing or deleting /etc/hostid after creating ZFS pools may leave"
+		ewarn "pools un-importable or cause the system to fail to boot."
+		ewarn " "
+	fi
+}

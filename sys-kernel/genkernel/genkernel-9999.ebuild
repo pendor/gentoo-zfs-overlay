@@ -2,8 +2,8 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-kernel/genkernel/genkernel-3.4.15.ebuild,v 1.2 2011/04/25 21:10:28 sping Exp $
 
-# genkernel-9999        -> latest Git branch "master"
-# genkernel-VERSION     -> normal genkernel release
+# genkernel-9999				-> latest Git branch "master"
+# genkernel-VERSION		 -> normal genkernel release
 
 VERSION_BUSYBOX='1.18.1'
 VERSION_DMAP='1.02.22'
