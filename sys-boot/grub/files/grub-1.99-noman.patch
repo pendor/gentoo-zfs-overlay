@@ -1,0 +1,11 @@
+--- configure.ac~	2011-07-19 13:02:46.000000000 -0400
++++ configure.ac	2011-07-19 13:03:14.000000000 -0400
+@@ -292,7 +292,7 @@
+ if test "x$cross_compiling" = xyes; then
+   AC_MSG_WARN([cannot generate manual pages while cross compiling])
+ else
+-  AC_PATH_PROG(HELP2MAN, help2man)
++  AC_MSG_WARN([disabling manual page generation as it is broken])
+ fi
+ 
+ # Check for functions and headers.
