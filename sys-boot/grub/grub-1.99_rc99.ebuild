@@ -3,6 +3,7 @@
 # $Header: /var/cvsroot/gentoo-x86/sys-boot/grub/grub-9999.ebuild,v 1.34 2011/06/28 16:33:29 vapier Exp $
 
 # XXX: need to implement a grub.conf migration in pkg_postinst before we ~arch
+EAPI="2"
 
 inherit mount-boot eutils flag-o-matic toolchain-funcs autotools
 # bzr
@@ -38,13 +39,9 @@ DEPEND="${RDEPEND}
 export STRIP_MASK="*/grub/*/*.mod"
 QA_EXECSTACK="sbin/grub-probe sbin/grub-setup sbin/grub-mkdevicemap bin/grub-script-check bin/grub-fstest"
 
-src_unpack() {
-	unpack ${A}
-
-	cd "${S}"
+src_prepare() {
 	epatch "${FILESDIR}"/${PN}-1.99-zfs.patch
 	epatch "${FILESDIR}"/${PN}-1.99-noman.patch
-
 	epatch_user
 
 	# autogen.sh does more than just run autotools
@@ -58,9 +55,14 @@ src_unpack() {
 		util/bash-completion.d/Makefile.in || die
 }
 
-src_compile() {
+src_configure() {
 	use custom-cflags || unset CFLAGS CPPFLAGS LDFLAGS
 	use static && append-ldflags -static
+
+	use zfs && extraIncl=" -I${EPREFIX}/usr/include/zfs -I${EPREFIX}/usr/include/spl"
+	export CFLAGS="${CFLAGS}${extraIncl}"
+	export CPPFLAGS="${CPPFLAGS}${extraIncl}"
+	export LDFLAGS="${LDFLAGS}${extraIncl}"
 
 	econf \
 		--disable-werror \
@@ -73,7 +75,9 @@ src_compile() {
 		$(use_enable debug mm-debug) \
 		$(use sdl && use_enable debug grub-emu-sdl) \
 		$(use_enable debug grub-emu-usb)
+}
 
+src_compile() {
 	emake -j1 || die
 }
 
