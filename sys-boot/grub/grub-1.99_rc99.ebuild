@@ -59,10 +59,8 @@ src_configure() {
 	use custom-cflags || unset CFLAGS CPPFLAGS LDFLAGS
 	use static && append-ldflags -static
 
-	use zfs && extraIncl=" -I${EPREFIX}/usr/include/zfs -I${EPREFIX}/usr/include/spl"
+	use zfs && extraIncl=" -I${EPREFIX}/usr/include/libzfs"
 	export CFLAGS="${CFLAGS}${extraIncl}"
-	export CPPFLAGS="${CPPFLAGS}${extraIncl}"
-	export LDFLAGS="${LDFLAGS}${extraIncl}"
 
 	econf \
 		--disable-werror \

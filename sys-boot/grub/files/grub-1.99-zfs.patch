@@ -13,7 +13,7 @@ diff -ruw grub-1.99-bzr-orig/configure.ac grub-1.99-bzr/configure.ac
  AC_CHECK_FUNCS(posix_memalign memalign asprintf vasprintf getextmntent)
 -AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h)
 +AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h,[],[],[$ac_includes_default
-+#include <sys/ioctl.h>])
++#include <zfs-linux/zfs_config.h>])
  
  AC_CHECK_MEMBERS([struct statfs.f_fstypename],,,[$ac_includes_default
 @@ -905,17 +909,19 @@
