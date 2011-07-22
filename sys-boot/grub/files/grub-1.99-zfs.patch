@@ -107,9 +107,8 @@ diff -ruw grub-1.99-bzr-orig/grub-core/kern/emu/misc.c grub-1.99-bzr/grub-core/k
      if (! mnttab)
        return;
  
-diff -ruw grub-1.99-bzr-orig/util/grub.d/10_linux.in grub-1.99-bzr/util/grub.d/10_linux.in
---- grub-1.99-bzr-orig/util/grub.d/10_linux.in	2011-07-14 13:10:50.000000000 -0400
-+++ grub-1.99-bzr/util/grub.d/10_linux.in	2011-07-14 23:31:17.000000000 -0400
+--- grub-1.99/util/grub.d/10_linux.in.orig	2011-07-21 22:28:25.000000000 -0400
++++ grub-1.99/util/grub.d/10_linux.in	2011-07-21 22:31:34.000000000 -0400
 @@ -51,7 +51,10 @@
    LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
  fi
@@ -118,7 +117,7 @@ diff -ruw grub-1.99-bzr-orig/util/grub.d/10_linux.in grub-1.99-bzr/util/grub.d/1
 +LINUX_ROOT_FS=`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2>/dev/null || true`
 +LINUX_ROOT_STAT=`stat -f --printf=%T / || true`
 +
-+if [ "x${LINUX_ROOT_FS}" = xbtrfs || "x${LINUX_ROOT_STAT}" = xbtrfs ]; then
++if [ "x${LINUX_ROOT_FS}" = xbtrfs ] || [ "x${LINUX_ROOT_STAT}" = xbtrfs ]; then
    rootsubvol="`make_system_path_relative_to_its_root /`"
    rootsubvol="${rootsubvol#/}"
    if [ "x${rootsubvol}" != x ]; then
@@ -133,7 +132,7 @@ diff -ruw grub-1.99-bzr-orig/util/grub.d/10_linux.in grub-1.99-bzr/util/grub.d/1
  linux_entry ()
  {
    os="$1"
-@@ -113,6 +120,12 @@
+@@ -113,10 +120,20 @@
      fi
      printf '%s\n' "${prepare_boot_cache}"
    fi
@@ -142,7 +141,16 @@ diff -ruw grub-1.99-bzr-orig/util/grub.d/10_linux.in grub-1.99-bzr/util/grub.d/1
 +	insmod zfsinfo
 +	zfs-bootfs (\$root) bootfs
 +EOF
++    # ZFS doesn't want root=... or read-only.
++    rootentry=""
++  else
++    rootentry="root=${linux_root_device_thisversion} ro"
 +  fi
    message="$(gettext_printf "Loading Linux %s ..." ${version})"
    cat << EOF
  	echo	'$message'
+-	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
++	linux	${rel_dirname}/${basename} ${rootentry} ${args}
+ EOF
+   if test -n "${initrd}" ; then
+     message="$(gettext_printf "Loading initial ramdisk ...")"
