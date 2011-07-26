@@ -1,0 +1,151 @@
+diff -ruw grub-1.99-bzr-orig/configure.ac grub-1.99-bzr/configure.ac
+--- grub-1.99-bzr-orig/configure.ac	2011-07-14 13:10:50.000000000 -0400
++++ grub-1.99-bzr/configure.ac	2011-07-14 20:42:10.000000000 -0400
+@@ -295,8 +295,13 @@
+   AC_PATH_PROG(HELP2MAN, help2man)
+ fi
+ 
++# The Solaris Portability Layer is required to link grub against zfs-lib on Linux.
++AC_CHECK_LIB([spl], [getextmntent], [ LIBS="$LIBS -pthread -lspl"
++  AC_DEFINE([HAVE_LIBSPL], [1], [Define to 1 if you have the SPL library.])],)
++
+ # Check for functions and headers.
+ AC_CHECK_FUNCS(posix_memalign memalign asprintf vasprintf getextmntent)
+-AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h)
++AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h,[],[],[$ac_includes_default
++#include <zfs-linux/zfs_config.h>])
+ 
+ AC_CHECK_MEMBERS([struct statfs.f_fstypename],,,[$ac_includes_default
+@@ -919,17 +923,19 @@
+                         [Define to 1 if you have the LZMA library.])],)
+ AC_SUBST([LIBLZMA])
+ 
+-AC_CHECK_LIB([zfs], [libzfs_init],
+-             [LIBZFS="-lzfs"
+-              AC_DEFINE([HAVE_LIBZFS], [1],
+-                        [Define to 1 if you have the ZFS library.])],)
+-AC_SUBST([LIBZFS])
++# These libraries and zpool below are external to libzfs on Linux,
++# but usually internal or intrinsic on other platforms.
++AC_CHECK_LIB([avl], [avl_create], [LIBS="$LIBS -lavl"])
++AC_CHECK_LIB([efi], [efi_alloc_and_init], [LIBS="$LIBS -lefi"])
++AC_CHECK_LIB([unicode], [u8_strcmp], [LIBS="$LIBS -lunicode"])
+ 
+-AC_CHECK_LIB([nvpair], [nvlist_print],
+-             [LIBNVPAIR="-lnvpair"
+-              AC_DEFINE([HAVE_LIBNVPAIR], [1],
+-                        [Define to 1 if you have the NVPAIR library.])],)
++AC_CHECK_LIB([nvpair], [nvlist_print], [LIBS="$LIBS -lnvpair" LIBNVPAIR="$LIBS"
++  AC_DEFINE([HAVE_LIBNVPAIR], [1], [Define to 1 if you have the NVPAIR library.])],)
+ AC_SUBST([LIBNVPAIR])
++AC_CHECK_LIB([zpool], [zfs_prop_init], [LIBS="$LIBS -lzpool"])
++AC_CHECK_LIB([zfs], [libzfs_init], [LIBS="$LIBS -lzfs" LIBZFS="$LIBS"
++  AC_DEFINE([HAVE_LIBZFS], [1], [Define to 1 if you have the ZFS library.])],)
++AC_SUBST([LIBZFS])
+ 
+ LIBS=""
+ 
+diff -ruw grub-1.99-bzr-orig/grub-core/kern/emu/getroot.c grub-1.99-bzr/grub-core/kern/emu/getroot.c
+--- grub-1.99-bzr-orig/util/getroot.c	2011-07-14 13:10:50.000000000 -0400
++++ grub-1.99-bzr/util/getroot.c	2011-07-14 21:08:55.000000000 -0400
+@@ -36,3 +36,14 @@
+ #include <grub/cryptodisk.h>
++#ifdef HAVE_LIBSPL
++# include <sys/ioctl.h>
++/*
++ * The Solaris Compatibility Layer provides getextmntent on Linux, which is
++ * required for grub-probe to recognize a native ZFS root filesystem on
++ * a Linux system. This typedef is required because including the SPL
++ * types.h here conflicts with an earlier Linux types.h inclusion.
++ */
++  typedef unsigned int uint_t;
++# include <libspl/sys/mnttab.h>
++#endif
+ 
+ #ifdef HAVE_SYS_MKDEV_H
+@@ -593,16 +593,16 @@
+   struct stat st;
+   dev_t dev;
+ 
+-#ifdef __linux__
+-  if (!os_dev)
+-    os_dev = grub_find_root_device_from_mountinfo (dir, NULL);
+-#endif /* __linux__ */
+-
+ #if defined(HAVE_LIBZFS) && defined(HAVE_LIBNVPAIR)
+   if (!os_dev)
+     os_dev = find_root_device_from_libzfs (dir);
+ #endif
+ 
++#ifdef __linux__
++  if (!os_dev)
++    os_dev = grub_find_root_device_from_mountinfo (dir, NULL);
++#endif /* __linux__ */
++
+   if (os_dev)
+     {
+       if (stat (os_dev, &st) >= 0)
+@@ -1410,7 +1420,15 @@
+     if (stat (dir, &st) != 0)
+       return;
+ 
+-    FILE *mnttab = fopen ("/etc/mnttab", "r");
++    FILE *mnttab;
++    mnttab = fopen ("/proc/mounts", "r");
++
++    if (! mnttab)
++      mnttab = fopen ("/etc/mtab", "r");
++
++    if (! mnttab)
++      mnttab = fopen ("/etc/mnttab", "r");
++
+     if (! mnttab)
+       return;
+ 
+--- grub-1.99/util/grub.d/10_linux.in.orig	2011-07-21 22:28:25.000000000 -0400
++++ grub-1.99/util/grub.d/10_linux.in	2011-07-21 22:31:34.000000000 -0400
+@@ -51,7 +51,10 @@
+   LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
+ fi
+ 
+-if [ "x`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2>/dev/null || true`" = xbtrfs ]; then
++LINUX_ROOT_FS=`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2>/dev/null || true`
++LINUX_ROOT_STAT=`stat -f --printf=%T / || true`
++
++if [ "x${LINUX_ROOT_FS}" = xbtrfs ] || [ "x${LINUX_ROOT_STAT}" = xbtrfs ]; then
+   rootsubvol="`make_system_path_relative_to_its_root /`"
+   rootsubvol="${rootsubvol#/}"
+   if [ "x${rootsubvol}" != x ]; then
+@@ -59,6 +62,10 @@
+   fi
+ fi
+ 
++if [ "x${LINUX_ROOT_FS}" = xzfs ]; then
++  GRUB_CMDLINE_LINUX="boot=zfs \$bootfs ${GRUB_CMDLINE_LINUX}"
++fi
++
+ linux_entry ()
+ {
+   os="$1"
+@@ -113,10 +120,20 @@
+     fi
+     printf '%s\n' "${prepare_boot_cache}"
+   fi
++  if [ "x${LINUX_ROOT_FS}" = xzfs ]; then
++    cat << EOF
++	insmod zfsinfo
++	zfs-bootfs (\$root) bootfs
++EOF
++    # ZFS doesn't want root=... or read-only.
++    rootentry=""
++  else
++    rootentry="root=${linux_root_device_thisversion} ro"
++  fi
+   message="$(gettext_printf "Loading Linux %s ..." ${version})"
+   cat << EOF
+ 	echo	'$message'
+-	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
++	linux	${rel_dirname}/${basename} ${rootentry} ${args}
+ EOF
+   if test -n "${initrd}" ; then
+     message="$(gettext_printf "Loading initial ramdisk ...")"
