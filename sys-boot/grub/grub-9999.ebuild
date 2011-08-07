@@ -36,7 +36,6 @@ QA_EXECSTACK="sbin/grub-probe sbin/grub-setup sbin/grub-mkdevicemap bin/grub-scr
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-9999-zfs.patch
 	epatch "${FILESDIR}"/${PN}-1.99-noman.patch
-	epatch "${FILESDIR}"/${PN}-9999-fzap.patch
 	epatch_user
 
 	# autogen.sh does more than just run autotools
