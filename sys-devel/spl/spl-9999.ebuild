@@ -34,7 +34,7 @@ fi
 
 src_unpack() {
 	if [[ ${PV} == 9999* ]] ; then
-		git_src_unpack
+		git-2_src_unpack
 	else
 		unpack ${MY_P}.tar.gz
 	fi
