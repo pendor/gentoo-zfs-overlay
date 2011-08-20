@@ -55,3 +55,25 @@ The first discovered zpool with a bootfs attribute set will have that FS mounted
 If manual configuration of root is preferred over auto based on zpool properties, then set something like:
 
 	real_root=ZFS=rpool/ROOT
+
+"Branching" Out
+===============
+
+This falls under general Gentoo knowledge, but if the need ever arises to run these ebuilds against a custom branch of the repo, it's possible to do so without hacking the ebuild files themselves using Portage's env folder combined with ebuild phase hooks.  For example, to build from Brian's private udev branch:
+
+    # mkdir -p /etc/portage/env/sys-fs
+		# cat > /etc/portage/env/sys-fs/zfs <<EOF
+    #!/bin/bash
+		# Override to use Brian's testing repo
+		pre_pkg_setup() {
+			EGIT_REPO_URI="https://github.com/behlendorf/zfs"
+			EGIT_BRANCH="udev"
+		}
+		EOF
+
+To go back to normal, just `rm /etc/portage/env/sys-fs/zfs`.
+
+References:
+
+* http://sergiosdj.wordpress.com/2008/06/24/how-to-personalize-a-packages-cflags-in-gentoo/
+* http://dev.gentoo.org/~zmedico/portage/doc/portage.html#config-bashrc-ebuild-phase-hooks 
