@@ -1,7 +1,8 @@
-diff -ruw grub-1.99-bzr-orig/configure.ac grub-1.99-bzr/configure.ac
---- grub-1.99-bzr-orig/configure.ac	2011-07-14 13:10:50.000000000 -0400
-+++ grub-1.99-bzr/configure.ac	2011-07-14 20:42:10.000000000 -0400
-@@ -295,8 +295,13 @@
+diff --git a/configure.ac b/configure.ac
+index e6d7265..3137869 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -295,9 +295,14 @@ else
    AC_PATH_PROG(HELP2MAN, help2man)
  fi
  
@@ -16,7 +17,8 @@ diff -ruw grub-1.99-bzr-orig/configure.ac grub-1.99-bzr/configure.ac
 +#include <zfs-linux/zfs_config.h>])
  
  AC_CHECK_MEMBERS([struct statfs.f_fstypename],,,[$ac_includes_default
-@@ -919,17 +923,19 @@
+ #include <sys/param.h>
+@@ -922,17 +927,19 @@ AC_CHECK_LIB([lzma], [lzma_code],
                          [Define to 1 if you have the LZMA library.])],)
  AC_SUBST([LIBLZMA])
  
@@ -45,12 +47,15 @@ diff -ruw grub-1.99-bzr-orig/configure.ac grub-1.99-bzr/configure.ac
  
  LIBS=""
  
-diff -ruw grub-1.99-bzr-orig/grub-core/kern/emu/getroot.c grub-1.99-bzr/grub-core/kern/emu/getroot.c
---- grub-1.99-bzr-orig/util/getroot.c	2011-07-14 13:10:50.000000000 -0400
-+++ grub-1.99-bzr/util/getroot.c	2011-07-14 21:08:55.000000000 -0400
-@@ -36,3 +36,14 @@
+diff --git a/util/getroot.c b/util/getroot.c
+index 7106458..592a02f 100644
+--- a/util/getroot.c
++++ b/util/getroot.c
+@@ -34,6 +34,17 @@
+ #include <stdint.h>
+ #include <grub/util/misc.h>
  #include <grub/cryptodisk.h>
-+#ifdef HAVE_LIBSPL
++#if defined(HAVE_LIBSPL) && defined(__linux__)
 +# include <sys/ioctl.h>
 +/*
 + * The Solaris Compatibility Layer provides getextmntent on Linux, which is
@@ -62,8 +67,9 @@ diff -ruw grub-1.99-bzr-orig/grub-core/kern/emu/getroot.c grub-1.99-bzr/grub-cor
 +# include <libspl/sys/mnttab.h>
 +#endif
  
- #ifdef HAVE_SYS_MKDEV_H
-@@ -593,16 +593,16 @@
+ #ifdef HAVE_DEVICE_MAPPER
+ # include <libdevmapper.h>
+@@ -598,16 +609,16 @@ grub_guess_root_device (const char *dir)
    struct stat st;
    dev_t dev;
  
@@ -84,17 +90,28 @@ diff -ruw grub-1.99-bzr-orig/grub-core/kern/emu/getroot.c grub-1.99-bzr/grub-cor
 +
    if (os_dev)
      {
-       if (stat (os_dev, &st) >= 0)
-@@ -1410,7 +1420,15 @@
+       char *tmp = os_dev;
+@@ -1399,7 +1410,7 @@ grub_find_zpool_from_dir (const char *dir, char **poolname, char **poolfs)
+     *poolname = xstrdup (mnt.f_mntfromname);
+   }
+ #elif defined(HAVE_GETEXTMNTENT)
+-  /* Solaris.  */
++  /* Solaris and ZFSonLinux (but not FUSE).  */
+   {
+     struct stat st;
+     struct extmnttab mnt;
+@@ -1407,7 +1418,17 @@ grub_find_zpool_from_dir (const char *dir, char **poolname, char **poolfs)
      if (stat (dir, &st) != 0)
        return;
  
 -    FILE *mnttab = fopen ("/etc/mnttab", "r");
-+    FILE *mnttab;
-+    mnttab = fopen ("/proc/mounts", "r");
++    FILE *mnttab = NULL;
 +
-+    if (! mnttab)
-+      mnttab = fopen ("/etc/mtab", "r");
++#ifdef __linux__
++    /* Look in proc only for Linux.  Solaris (and anything else with 
++       HAVE_GETEXTMNTENT) won't need it. */
++    mnttab = fopen ("/proc/mounts", "r");
++#endif
 +
 +    if (! mnttab)
 +      mnttab = fopen ("/etc/mnttab", "r");
@@ -102,40 +119,32 @@ diff -ruw grub-1.99-bzr-orig/grub-core/kern/emu/getroot.c grub-1.99-bzr/grub-cor
      if (! mnttab)
        return;
  
---- grub-1.99/util/grub.d/10_linux.in.orig	2011-07-21 22:28:25.000000000 -0400
-+++ grub-1.99/util/grub.d/10_linux.in	2011-07-21 22:31:34.000000000 -0400
-@@ -51,7 +51,10 @@
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+index 97e7c65..5624607 100644
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -51,12 +51,15 @@ else
    LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
  fi
  
 -if [ "x`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2>/dev/null || true`" = xbtrfs ]; then
 +LINUX_ROOT_FS=`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2>/dev/null || true`
-+LINUX_ROOT_STAT=`stat -f --printf=%T / || true`
-+
-+if [ "x${LINUX_ROOT_FS}" = xbtrfs ] || [ "x${LINUX_ROOT_STAT}" = xbtrfs ]; then
++if [ "x${LINUX_ROOT_FS}" = xbtrfs ] ; then
    rootsubvol="`make_system_path_relative_to_its_root /`"
    rootsubvol="${rootsubvol#/}"
    if [ "x${rootsubvol}" != x ]; then
-@@ -59,6 +62,10 @@
+     GRUB_CMDLINE_LINUX="rootflags=subvol=${rootsubvol} ${GRUB_CMDLINE_LINUX}"
    fi
++elif [ "x${LINUX_ROOT_FS}" = xzfs ]; then
++  GRUB_CMDLINE_LINUX="boot=zfs ${GRUB_CMDLINE_LINUX}"
  fi
  
-+if [ "x${LINUX_ROOT_FS}" = xzfs ]; then
-+  GRUB_CMDLINE_LINUX="boot=zfs \$bootfs ${GRUB_CMDLINE_LINUX}"
-+fi
-+
  linux_entry ()
- {
-   os="$1"
-@@ -113,10 +120,20 @@
+@@ -113,10 +116,16 @@ EOF
      fi
      printf '%s\n' "${prepare_boot_cache}"
    fi
 +  if [ "x${LINUX_ROOT_FS}" = xzfs ]; then
-+    cat << EOF
-+	insmod zfsinfo
-+	zfs-bootfs (\$root) bootfs
-+EOF
 +    # ZFS doesn't want root=... or read-only.
 +    rootentry=""
 +  else
