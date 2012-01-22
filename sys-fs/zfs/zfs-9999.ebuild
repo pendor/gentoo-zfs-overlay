@@ -61,6 +61,7 @@ pkg_setup() {
 }
 
 src_prepare() {
+	epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
 	eautoreconf
 }
 
@@ -72,7 +73,7 @@ src_configure() {
 		--with-linux-obj="${KERNEL_DIR}" \
 		--with-spl=/usr/include/spl \
 		--with-spl-obj=/usr/include/spl/module \
-		--exec-prefix=/ --libexecdir=/usr/libexec
+		--libexecdir=/usr/libexec
 }
 
 src_compile() {

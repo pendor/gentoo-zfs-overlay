@@ -39,7 +39,19 @@ src_unpack() {
 }
 
 src_prepare() {
+	epatch "${FILESDIR}"/${PN}-0.6.0-rc6-includedir.patch
 	eautoreconf
+}
+
+pkg_setup() {
+	linux-mod_pkg_setup
+	kernel_is gt 2 6 32 || die "Your kernel is too old. ${CATEGORY}/${PN} need 2.6.32 or newer."
+	linux_config_exists || die "Your kernel sources are unconfigured."
+	if ! linux_chkconfig_present PREEMPT_NONE; then
+		eerror "${CATEGORY}/${PN} doesn't currently work with PREEMPT kernel."
+		eerror "Please look at bug https://github.com/behlendorf/zfs/issues/83 ."
+		die "PREEMPT kernel"
+	fi
 }
 
 src_configure() {
@@ -47,12 +59,20 @@ src_configure() {
 	econf \
 		--with-config=all \
 		--with-linux="${KERNEL_DIR}" \
-		--with-linux-obj="${KERNEL_DIR}" \
-		--exec-prefix=/
+		--with-linux-obj="${KERNEL_DIR}"
+}
+
+src_compile()	{
+	# Not sure why, but jumping straight to make install seems to leave
+	# module/Module.symvers missing.  make, then make install works.
+	set_arch_to_kernel
+	emake || die 'emake install failed'
 }
 
 src_install() {
+	set_arch_to_kernel
 	emake DESTDIR="${D}" install || die 'emake install failed'
+	find "${D}/usr/include/" -type f -exec chmod a-x "{}" \;
 	dosym /usr/include/spl/spl_config.h /usr/include/spl/module/spl_config.h \
 		|| die
 }
