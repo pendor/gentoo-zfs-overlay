@@ -92,6 +92,7 @@ src_install() {
 }
 
 pkg_postinst() {
+	linux-mod_pkg_postinst
 	# Create write the hostid only if it doesn't exist.
 	# This is done outside of packaging since we don't want it
 	# deleted on remerge/upgrades.
