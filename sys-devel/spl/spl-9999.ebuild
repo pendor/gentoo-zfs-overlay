@@ -39,7 +39,6 @@ src_unpack() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
 	eautoreconf
 }
 
