@@ -61,7 +61,7 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-0.6.0-includedir.patch
+	epatch "${FILESDIR}"/${PN}-0.6.0-rc6-includedir.patch
 	eautoreconf
 }
 
