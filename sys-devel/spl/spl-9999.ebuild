@@ -15,18 +15,16 @@ SLOT="0"
 KEYWORDS=""
 IUSE=""
 
-DEPEND="
-		>=virtual/linux-sources-2.6
-		"
+DEPEND=""
 RDEPEND=""
 
 if [[ ${PV} == 9999* ]] ; then
 	SRC_URI=""
 	EGIT_REPO_URI="https://github.com/zfsonlinux/spl.git"
-	inherit git-2 linux-info eutils autotools
+	inherit git-2 linux-info eutils autotools linux-mod
 else
 	MY_P=${P/_rc/-rc}
-	inherit linux-info eutils autotools
+	inherit linux-info eutils autotools linux-mod
 	SRC_URI="mirror://gentoo/${MY_P}.tar.gz
 									https://github.com/downloads/zfsonlinux/spl/${MY_P}.tar.gz"
 	S=${WORKDIR}/${MY_P}
