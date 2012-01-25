@@ -62,6 +62,9 @@ pkg_setup() {
 
 src_prepare() {
 	epatch "${FILESDIR}"/${PN}-0.6.0-rc6-includedir.patch
+	# Fix install dir for Dracut modules
+	sed -i "s:\\\$(datadir)/dracut/:${EPREFIX}/usr/lib/dracut/:" \
+		"${S}"/dracut/90zfs/Makefile.am || die
 	eautoreconf
 }
 
