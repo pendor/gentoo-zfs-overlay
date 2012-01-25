@@ -2,23 +2,19 @@ diff --git a/configure.ac b/configure.ac
 index e6d7265..3137869 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -295,9 +295,14 @@ else
+@@ -295,9 +295,10 @@ else
    AC_PATH_PROG(HELP2MAN, help2man)
  fi
  
-+# The Solaris Portability Layer is required to link grub against zfs-lib on Linux.
-+AC_CHECK_LIB([spl], [getextmntent], [ LIBS="$LIBS -pthread -lspl"
-+  AC_DEFINE([HAVE_LIBSPL], [1], [Define to 1 if you have the SPL library.])],)
-+
  # Check for functions and headers.
  AC_CHECK_FUNCS(posix_memalign memalign asprintf vasprintf getextmntent)
--AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h)
-+AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h,[],[],[$ac_includes_default
+-AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h limits.h)
++AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h limits.h,[],[],[$ac_includes_default
 +#include <zfs-linux/zfs_config.h>])
  
  AC_CHECK_MEMBERS([struct statfs.f_fstypename],,,[$ac_includes_default
  #include <sys/param.h>
-@@ -922,17 +927,19 @@ AC_CHECK_LIB([lzma], [lzma_code],
+@@ -922,17 +927,20 @@ AC_CHECK_LIB([lzma], [lzma_code],
                          [Define to 1 if you have the LZMA library.])],)
  AC_SUBST([LIBLZMA])
  
@@ -27,11 +23,12 @@ index e6d7265..3137869 100644
 -              AC_DEFINE([HAVE_LIBZFS], [1],
 -                        [Define to 1 if you have the ZFS library.])],)
 -AC_SUBST([LIBZFS])
-+# These libraries and zpool below are external to libzfs on Linux,
++# Some libraries and zpool below are external to libzfs on Linux,
 +# but usually internal or intrinsic on other platforms.
 +AC_CHECK_LIB([avl], [avl_create], [LIBS="$LIBS -lavl"])
 +AC_CHECK_LIB([efi], [efi_alloc_and_init], [LIBS="$LIBS -lefi"])
 +AC_CHECK_LIB([unicode], [u8_strcmp], [LIBS="$LIBS -lunicode"])
++AC_CHECK_LIB([uutil], [xdr_control], [LIBS="$LIBS -luutil"])
  
 -AC_CHECK_LIB([nvpair], [nvlist_print],
 -             [LIBNVPAIR="-lnvpair"
@@ -51,11 +48,9 @@ diff --git a/util/getroot.c b/util/getroot.c
 index 7106458..592a02f 100644
 --- a/util/getroot.c
 +++ b/util/getroot.c
-@@ -34,6 +34,17 @@
- #include <stdint.h>
- #include <grub/util/misc.h>
- #include <grub/cryptodisk.h>
-+#if defined(HAVE_LIBSPL) && defined(__linux__)
+@@ -42,3 +42,15 @@
+ 
++#if defined(HAVE_LIBZFS) && defined(__linux__)
 +# include <sys/ioctl.h>
 +/*
 + * The Solaris Compatibility Layer provides getextmntent on Linux, which is
@@ -66,10 +61,10 @@ index 7106458..592a02f 100644
 +  typedef unsigned int uint_t;
 +# include <libspl/sys/mnttab.h>
 +#endif
- 
++
  #ifdef HAVE_DEVICE_MAPPER
  # include <libdevmapper.h>
-@@ -598,16 +609,16 @@ grub_guess_root_device (const char *dir)
+@@ -705,14 +705,14 @@ grub_guess_root_device (const char *dir)
    struct stat st;
    dev_t dev;
  
@@ -78,10 +73,8 @@ index 7106458..592a02f 100644
 -    os_dev = grub_find_root_device_from_mountinfo (dir, NULL);
 -#endif /* __linux__ */
 -
- #if defined(HAVE_LIBZFS) && defined(HAVE_LIBNVPAIR)
    if (!os_dev)
      os_dev = find_root_device_from_libzfs (dir);
- #endif
  
 +#ifdef __linux__
 +  if (!os_dev)
