@@ -46,7 +46,7 @@ src_unpack() {
 
 pkg_setup() {
 	linux-mod_pkg_setup
-	kernel_is gt 2 6 32 || die "Your kernel is too old. ${CATEGORY}/${PN} need 2.6.32 or newer."
+	kernel_is ge 2 6 32 || die "Your kernel is too old. ${CATEGORY}/${PN} need 2.6.32 or newer."
 	linux_config_exists || die "Your kernel sources are unconfigured."
 	if linux_chkconfig_present PREEMPT; then
 		eerror "${CATEGORY}/${PN} doesn't currently work with PREEMPT kernel."
