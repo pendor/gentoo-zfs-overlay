@@ -87,7 +87,8 @@ index 7106458..592a02f 100644
 @@ -1399,7 +1410,7 @@ grub_find_zpool_from_dir (const char *dir, char **poolname, char **poolfs)
      *poolname = xstrdup (mnt.f_mntfromname);
    }
- #elif defined(HAVE_GETEXTMNTENT)
+-#elif defined(HAVE_GETEXTMNTENT)
++#elif defined(HAVE_GETEXTMNTENT) || defined(__linux__)
 -  /* Solaris.  */
 +  /* Solaris and ZFSonLinux (but not FUSE).  */
    {
