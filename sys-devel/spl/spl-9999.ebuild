@@ -47,9 +47,9 @@ pkg_setup() {
 	linux-mod_pkg_setup
 	kernel_is ge 2 6 32 || die "Your kernel is too old. ${CATEGORY}/${PN} need 2.6.32 or newer."
 	linux_config_exists || die "Your kernel sources are unconfigured."
-	if ! linux_chkconfig_present PREEMPT_NONE; then
+	if linux_chkconfig_present PREEMPT; then
 		eerror "${CATEGORY}/${PN} doesn't currently work with PREEMPT kernel."
-		eerror "Please look at bug https://github.com/behlendorf/zfs/issues/83 ."
+		eerror "Please look at bug https://github.com/zfsonlinux/zfs/issues/83 ."
 		die "PREEMPT kernel"
 	fi
 }
