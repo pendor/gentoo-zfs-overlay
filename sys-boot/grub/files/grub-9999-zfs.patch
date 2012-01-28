@@ -105,35 +105,30 @@ diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
 index 97e7c65..5624607 100644
 --- a/util/grub.d/10_linux.in
 +++ b/util/grub.d/10_linux.in
-@@ -51,12 +51,16 @@ else
+@@ -51,12 +51,15 @@ else
    LINUX_ROOT_DEVICE=UUID=${GRUB_DEVICE_UUID}
  fi
  
 -if [ "x`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2>/dev/null || true`" = xbtrfs ]; then
 +LINUX_ROOT_FS=`${grub_probe} --device ${GRUB_DEVICE} --target=fs 2>/dev/null || true`
-+LINUX_ROOT_STAT=`stat -f --printf=%T / || true`
-+if [ "x${LINUX_ROOT_FS}" = xbtrfs -o "x${LINUX_ROOT_STAT}" = xbtrfs ] ; then
++if [ "x${LINUX_ROOT_FS}" = xbtrfs ] ; then
    rootsubvol="`make_system_path_relative_to_its_root /`"
    rootsubvol="${rootsubvol#/}"
    if [ "x${rootsubvol}" != x ]; then
      GRUB_CMDLINE_LINUX="rootflags=subvol=${rootsubvol} ${GRUB_CMDLINE_LINUX}"
    fi
 +elif [ "x${LINUX_ROOT_FS}" = xzfs ]; then
-+  GRUB_CMDLINE_LINUX="boot=zfs \$bootfs ${GRUB_CMDLINE_LINUX}"
++  GRUB_CMDLINE_LINUX="boot=zfs ${GRUB_CMDLINE_LINUX}"
  fi
  
  linux_entry ()
-@@ -113,10 +116,20 @@ EOF
+@@ -113,10 +116,16 @@ EOF
      fi
      printf '%s\n' "${prepare_boot_cache}"
    fi
 +  if [ "x${LINUX_ROOT_FS}" = xzfs ]; then
 +    # ZFS doesn't want root=... or read-only.
 +    rootentry=""
-+    cat << EOF
-+    insmod zfsinfo
-+    zfs-bootfs (\$root) bootfs
-+EOF
 +  else
 +    rootentry="root=${linux_root_device_thisversion} ro"
 +  fi
