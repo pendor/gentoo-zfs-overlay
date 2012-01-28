@@ -74,7 +74,8 @@ src_configure() {
 		--with-linux-obj="${KERNEL_DIR}" \
 		--with-spl=/usr/include/spl \
 		--with-spl-obj=/usr/include/spl/module \
-		--exec-prefix=/ --libexecdir=/usr/libexec
+		--exec-prefix=/ --libexecdir=/usr/libexec \
+		--with-udevruledir=/etc/udev/rules.d
 }
 
 src_compile() {
