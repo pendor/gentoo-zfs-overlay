@@ -2,7 +2,13 @@ diff --git a/configure.ac b/configure.ac
 index e6d7265..3137869 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -922,17 +927,20 @@ AC_CHECK_LIB([lzma], [lzma_code],
+@@ -301,2 +301,4 @@
+-AC_CHECK_FUNCS(posix_memalign memalign asprintf vasprintf getextmntent)
++AC_CHECK_FUNCS(posix_memalign memalign asprintf vasprintf)
+ AC_CHECK_HEADERS(libzfs.h libnvpair.h sys/param.h sys/mount.h sys/mnttab.h sys/mkdev.h limits.h)
++AC_CHECK_HEADERS(libspl/sys/mnttab.h,[],[],[$ac_includes_default
++#define uint_t unsigned int])
+@@ -922,17 +927,22 @@ AC_CHECK_LIB([lzma], [lzma_code],
                          [Define to 1 if you have the LZMA library.])],)
  AC_SUBST([LIBLZMA])
  
@@ -29,6 +35,8 @@ index e6d7265..3137869 100644
 +AC_CHECK_LIB([zfs], [libzfs_init], [LIBS="$LIBS -lzfs" LIBZFS="$LIBS"
 +  AC_DEFINE([HAVE_LIBZFS], [1], [Define to 1 if you have the ZFS library.])],)
 +AC_SUBST([LIBZFS])
++# Now that libzfs et al. is in LIBS, this check should succeed with ZFSonLinux.
++AC_CHECK_FUNCS(getextmntent)
  
  LIBS=""
  
@@ -38,7 +46,7 @@ index 7106458..592a02f 100644
 +++ b/util/getroot.c
 @@ -42,3 +42,15 @@
  
-+#if defined(HAVE_LIBZFS) && defined(__linux__)
++#if defined(HAVE_LIBZFS) && defined(HAVE_LIBSPL_SYS_MNTTAB_H)
 +# include <sys/ioctl.h>
 +/*
 + * The Solaris Compatibility Layer provides getextmntent on Linux, which is
@@ -75,8 +83,7 @@ index 7106458..592a02f 100644
 @@ -1399,7 +1410,7 @@ grub_find_zpool_from_dir (const char *dir, char **poolname, char **poolfs)
      *poolname = xstrdup (mnt.f_mntfromname);
    }
--#elif defined(HAVE_GETEXTMNTENT)
-+#elif defined(HAVE_GETEXTMNTENT) || defined(__linux__)
+ #elif defined(HAVE_GETEXTMNTENT)
 -  /* Solaris.  */
 +  /* Solaris and ZFSonLinux (but not FUSE).  */
    {
