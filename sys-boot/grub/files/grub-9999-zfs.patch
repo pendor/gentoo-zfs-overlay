@@ -131,8 +131,8 @@ index 97e7c65..5624607 100644
 +    # ZFS doesn't want root=... or read-only.
 +    rootentry=""
 +    cat << EOF
-+	insmod zfsinfo
-+	zfs-bootfs (\$root) bootfs
++    insmod zfsinfo
++    zfs-bootfs (\$root) bootfs
 +EOF
 +  else
 +    rootentry="root=${linux_root_device_thisversion} ro"
