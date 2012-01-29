@@ -7,7 +7,7 @@ diff -ruw dracut-014-orig/modules.d/90kernel-modules/module-setup.sh dracut-014/
          else
 -            hostonly='' instmods $(get_fs_type "/dev/block/$(find_root_block_device)")
 +            local foundMods=$(get_fs_type "/dev/block/$(find_root_block_device)")
-+            hostonly='' foundMods!='' instmods $foundMods
++            [ x$foundMods = x ] || hostonly='' instmods $foundMods
          fi
      else
          hostonly='' instmods $drivers
