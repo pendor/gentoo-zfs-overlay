@@ -39,7 +39,7 @@ src_prepare() {
 	find ${S} -name Makefile.am -exec \
 		sed -i "s:/usr/src/zfs-\\\$(ZFS_META_VERSION)-\\\$(ZFS_META_RELEASE)/\\\$(LINUX_VERSION):\\\${includedir}/zfs-linux/:g" "{}" \;
 
-	sed -i "s:/usr/src/zfs-\\\$release/\\\$(LINUX_VERSION):\\\${includedir}/zfs-linux/:g" \
+	sed -i "s:\\\$(DESTDIR)/usr/src/zfs-\\\$\\\$release/\\\$(LINUX_VERSION):\\\$(DESTDIR)/\\\${includedir}/zfs-linux/:g" \
 		${S}/Makefile.am
 	
 	# Fix install dir for Dracut modules
