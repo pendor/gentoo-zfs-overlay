@@ -44,10 +44,10 @@ src_configure() {
 #	emake || die 'emake install failed'
 #}
 
-#src_install() {
-#	set_arch_to_kernel
-#	emake DESTDIR="${D}" install || die 'emake install failed'
-#	find "${D}/usr/include/" -type f -exec chmod a-x "{}" \;
-#	dosym /usr/include/spl/spl_config.h /usr/include/spl/module/spl_config.h \
-#		|| die
-#}
+src_install() {
+	set_arch_to_kernel
+	emake DESTDIR="${D}" install || die 'emake install failed'
+	find "${D}/usr/include/" -type f -exec chmod a-x "{}" \;
+	dosym /usr/include/spl/spl_config.h /usr/include/spl/module/spl_config.h \
+		|| die
+}
