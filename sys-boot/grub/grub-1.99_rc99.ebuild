@@ -42,10 +42,10 @@ export STRIP_MASK="*/grub/*/*.mod"
 QA_EXECSTACK="sbin/grub-probe sbin/grub-setup sbin/grub-mkdevicemap bin/grub-script-check bin/grub-fstest"
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-grub-1.99-010-zfs_packed_la_array.patch
-	epatch "${FILESDIR}"/${PN}-grub-1.99-020-zfs_update.patch
-	epatch "${FILESDIR}"/${PN}-grub-1.99-029-noman.patch
-	epatch "${FILESDIR}"/${PN}-grub-1.99-030-zfs_gentoo_build.patch
+	epatch "${FILESDIR}"/${MY_P}-010-zfs_packed_la_array.patch
+	epatch "${FILESDIR}"/${MY_P}-020-zfs_update.patch
+	epatch "${FILESDIR}"/${MY_P}-029-noman.patch
+	epatch "${FILESDIR}"/${MY_P}-030-zfs_gentoo_build.patch
 	epatch_user
 
 	# autogen.sh does more than just run autotools
