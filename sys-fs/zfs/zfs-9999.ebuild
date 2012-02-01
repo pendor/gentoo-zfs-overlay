@@ -36,11 +36,11 @@ src_prepare() {
 	# Makefiles contain numerous cases of writing header files
 	# to /usr/src, but they should probably live in /usr/include.
 	einfo "Replacing /usr/src with /usr/include"
+	sed -i "s:usr/src/zfs-\\\$\\\$release/\\\$(LINUX_VERSION):\\\${includedir}/zfs-linux/:g" \
+		${S}/Makefile.am
+		
 	find ${S} -name Makefile.am -exec \
 		sed -i "s:/usr/src/zfs-\\\$(ZFS_META_VERSION)-\\\$(ZFS_META_RELEASE)/\\\$(LINUX_VERSION):\\\${includedir}/zfs-linux/:g" "{}" \;
-
-	sed -i "s:\\\$(DESTDIR)/usr/src/zfs-\\\$\\\$release/\\\$(LINUX_VERSION):\\\$(DESTDIR)/\\\${includedir}/zfs-linux/:g" \
-		${S}/Makefile.am
 	
 	# Fix install dir for Dracut modules
 	einfo "Fixing Dracut module install directory"
