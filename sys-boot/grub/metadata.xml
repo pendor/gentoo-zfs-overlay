@@ -5,5 +5,6 @@
 <use>
   <flag name='device-mapper'>Enable support for <pkg>sys-fs/device-mapper</pkg></flag>
   <flag name='multislot'>Allow grub1 and grub2 to be installed simultaneously</flag>
+  <flag name='zfs'>Use libzfs to support booting from ZFS root</flag>
 </use>
 </pkgmetadata>

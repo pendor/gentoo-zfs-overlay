@@ -31,7 +31,9 @@ RDEPEND=">=sys-libs/ncurses-5.2-r5
 	)
 	device-mapper? ( >=sys-fs/lvm2-2.02.45 )
 	truetype? ( media-libs/freetype >=media-fonts/unifont-5 )
-	zfs? ( >=sys-devel/spl-0.6.0_rc5 >=sys-fs/zfs-0.6.0_rc5 )"
+	zfs? ( >=sys-fs/zfs-0.6.0_rc5 )"
+# We'll dep on zfs only for now.  We need spl too, but there are differently
+# named packages on circulation for that, and ZFS requires it anyways.
 
 DEPEND="${RDEPEND}
 	>=dev-lang/python-2.5.2 >=sys-devel/autogen-5.10 sys-apps/help2man"
@@ -40,9 +42,10 @@ export STRIP_MASK="*/grub/*/*.mod"
 QA_EXECSTACK="sbin/grub-probe sbin/grub-setup sbin/grub-mkdevicemap bin/grub-script-check bin/grub-fstest"
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-1.99-zfs.patch
-	epatch "${FILESDIR}"/${PN}-1.99-noman.patch
-	epatch "${FILESDIR}"/${PN}-9999-fzap.patch
+	epatch "${FILESDIR}"/${PN}-grub-1.99-010-zfs_packed_la_array.patch
+	epatch "${FILESDIR}"/${PN}-grub-1.99-020-zfs_update.patch
+	epatch "${FILESDIR}"/${PN}-grub-1.99-029-noman.patch
+	epatch "${FILESDIR}"/${PN}-grub-1.99-030-zfs_gentoo_build.patch
 	epatch_user
 
 	# autogen.sh does more than just run autotools
@@ -59,9 +62,6 @@ src_prepare() {
 src_configure() {
 	use custom-cflags || unset CFLAGS CPPFLAGS LDFLAGS
 	use static && append-ldflags -static
-
-	use zfs && extraIncl=" -I${EPREFIX}/usr/include/libzfs"
-	export CFLAGS="${CFLAGS}${extraIncl}"
 
 	econf \
 		--disable-werror \
