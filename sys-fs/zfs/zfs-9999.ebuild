@@ -33,7 +33,12 @@ pkg_setup() {
 }
 
 src_prepare() {
-	epatch "${FILESDIR}"/${PN}-0.6.0-rc6-includedir.patch
+	#epatch "${FILESDIR}"/${PN}-0.6.0-rc6-includedir.patch
+
+	# Makefiles contain numerous cases of writing header files
+	# to /usr/src, but they should probably live in /usr/include.
+	find ${S} -name Makefile.am -exec \
+		sed -i "s:/usr/src/zfs-:\\\${includedir}/zfs-linux:g" "{}" \;
 
 	# Fix install dir for Dracut modules
 	sed -i "s:\\\$(datadir)/dracut/:${EPREFIX}/usr/lib/dracut/:" \
@@ -54,11 +59,6 @@ src_configure() {
 	)
 	autotools-utils_src_configure
 }
-
-#src_compile() {
-#	set_arch_to_kernel
-#	default # _not_ the one from linux-mod
-#}
 
 #src_install() {
 #	emake DESTDIR="${D}" install || die 'emake install failed'
