@@ -37,17 +37,8 @@ src_configure() {
 	autotools-utils_src_configure
 }
 
-#src_compile()	{
-#	# Not sure why, but jumping straight to make install seems to leave
-#	# module/Module.symvers missing.  make, then make install works.
-#	set_arch_to_kernel
-#	emake || die 'emake install failed'
-#}
-
-src_install() {
-	set_arch_to_kernel
-	emake DESTDIR="${D}" install || die 'emake install failed'
+pkg_preinst() {
+	# Need to link in the spl_config header or zfs can't find the version.
 	find "${D}/usr/include/" -type f -exec chmod a-x "{}" \;
-	dosym /usr/include/spl/spl_config.h /usr/include/spl/module/spl_config.h \
-		|| die
+	dosym /usr/include/spl/spl_config.h /usr/include/spl/module/spl_config.h
 }
