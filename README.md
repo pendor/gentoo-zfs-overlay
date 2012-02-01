@@ -22,7 +22,7 @@ Keep the overlay up to date from git:
 
 You'll probably need to unmask packages and make numerous other system changes to get things working at this point.  For semi-complete instructions, please see:
 
-    https://github.com/pendor/gentoo-zfs-install
+* https://github.com/pendor/gentoo-zfs-install
 
 "Branching" Out
 ===============
