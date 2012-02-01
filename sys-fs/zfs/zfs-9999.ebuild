@@ -33,14 +33,17 @@ pkg_setup() {
 }
 
 src_prepare() {
-	#epatch "${FILESDIR}"/${PN}-0.6.0-rc6-includedir.patch
-
 	# Makefiles contain numerous cases of writing header files
 	# to /usr/src, but they should probably live in /usr/include.
+	einfo "Replacing /usr/src with /usr/include"
 	find ${S} -name Makefile.am -exec \
-		sed -i "s:/usr/src/zfs-:\\\${includedir}/zfs-linux:g" "{}" \;
+		sed -i "s:/usr/src/zfs-\\\$(ZFS_META_VERSION)-\\\$(ZFS_META_RELEASE)/\\\$(LINUX_VERSION):\\\${includedir}/zfs-linux/:g" "{}" \;
 
+	sed -i "s:/usr/src/zfs-\\\$release/\\\$(LINUX_VERSION):\\\${includedir}/zfs-linux/:g" \
+		${S}/Makefile.am
+	
 	# Fix install dir for Dracut modules
+	einfo "Fixing Dracut module install directory"
 	sed -i "s:\\\$(datadir)/dracut/:${EPREFIX}/usr/lib/dracut/:" \
 		"${S}"/dracut/90zfs/Makefile.am || die
 	eautoreconf
@@ -59,16 +62,6 @@ src_configure() {
 	)
 	autotools-utils_src_configure
 }
-
-#src_install() {
-#	emake DESTDIR="${D}" install || die 'emake install failed'
-#	# Drop unwanted files
-#	rm -rf "${D}/usr/src" || die "removing unwanted files die"
-#
-#	# Can't install static libs or libtool files
-#	find "${D}" -name \*.la -delete
-#	find "${D}" -name \*.a -delete
-#}
 
 pkg_postinst() {
 	linux-mod_pkg_postinst
