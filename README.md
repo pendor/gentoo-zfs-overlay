@@ -3,8 +3,6 @@ Gentoo ZFS Overlay
 
 This project provides a Gentoo overlay to provide ebuilds for packages necessary to support ZFS on Gentoo from Brian Behlendorf's ZFSonLinux port.  This fork tracks work done to better integrate ZFS with Gentoo's filesystem structure and to match work done to genkernel to get a working Root on ZFS.
 
-Note that at this time, this overlay doesn't actually provide ebuilds for the spl package.  Both that and zfs are now available from the main Portage tree.  An ebuild of zfs is provided to deal with some on-going patching related to udev & Dracut, though it is anticipated that ebuild will be removed once patches are migrated upstream.
-
 This overlay's primary goal is to provide builds for modified versions of Grub, Genkernel, Dracut, and any other packages necessary to boot from a ZFS root device.
 
 Using this overlay

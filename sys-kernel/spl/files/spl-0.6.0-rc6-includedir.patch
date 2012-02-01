@@ -1,0 +1,22 @@
+--- spl-9999/include/Makefile.am~	2012-01-22 14:22:53.000000000 -0500
++++ spl-9999/include/Makefile.am	2012-01-22 14:25:40.325390010 -0500
+@@ -16,7 +16,7 @@
+ 
+ install-data-local:
+ 	release=$(SPL_META_VERSION)-$(SPL_META_RELEASE); \
+-	instdest=$(DESTDIR)/usr/src/spl-$$release/$(LINUX_VERSION); \
++	instdest=$(DESTDIR)/${includedir}/spl; \
+ 	instfiles=`find . -name '*.h'`; \
+         for instfile in $$instfiles; do \
+ 		$(INSTALL) -D $$instfile $$instdest/$$instfile; \
+--- spl-9999/Makefile.am~	2012-01-22 14:02:20.000000000 -0500
++++ spl-9999/Makefile.am	2012-01-22 14:05:09.044774782 -0500
+@@ -31,7 +31,7 @@
+ if CONFIG_KERNEL
+ install-data-local:
+ 	release=$(SPL_META_VERSION)-$(SPL_META_RELEASE); \
+-	instdest=$(DESTDIR)/usr/src/spl-$$release/$(LINUX_VERSION); \
++	instdest=$(DESTDIR)/${includedir}/spl; \
+ 	echo "$$release" >$$instdest/spl.release; \
+ 	for instfile in $(noinst_HEADERS) module/$(LINUX_SYMBOLS); do \
+ 		$(INSTALL) -D $$instfile $$instdest/$$instfile; \

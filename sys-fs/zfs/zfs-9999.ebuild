@@ -13,7 +13,7 @@ HOMEPAGE="http://zfsonlinux.org/"
 LICENSE="CDDL GPL-2"
 SLOT="0"
 KEYWORDS=""
-IUSE=""
+IUSE="static-libs"
 
 DEPEND="
 		>=sys-kernel/spl-${PV}
