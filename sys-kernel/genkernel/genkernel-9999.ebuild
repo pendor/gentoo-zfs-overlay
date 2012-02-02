@@ -54,8 +54,7 @@ DEPEND="sys-fs/e2fsprogs app-text/asciidoc
 	zfs? ( >=sys-kernel/spl-0.6.0_rc5 >=sys-fs/zfs-0.6.0_rc5 )"
 RDEPEND="${DEPEND} app-arch/cpio sys-kernel/dracut"
 
-src_unpack() {
-	git_src_unpack
+src_prepare() {
 	use selinux && sed -i 's/###//g' "${S}"/gen_compile.sh
 }
 
