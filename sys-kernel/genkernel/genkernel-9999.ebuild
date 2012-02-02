@@ -2,9 +2,6 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-kernel/genkernel/genkernel-3.4.15.ebuild,v 1.2 2011/04/25 21:10:28 sping Exp $
 
-# genkernel-9999				-> latest Git branch "master"
-# genkernel-VERSION		 -> normal genkernel release
-
 VERSION_BUSYBOX='1.18.1'
 VERSION_DMAP='1.02.22'
 VERSION_DMRAID='1.0.0.rc14'
@@ -37,23 +34,12 @@ COMMON_URI="${DM_HOME}/dmraid-${VERSION_DMRAID}.tar.bz2
 		http://podgorny.cz/unionfs-fuse/releases/unionfs-fuse-${VERSION_UNIONFS_FUSE}.tar.bz2
 		mirror://gnupg/gnupg/gnupg-${VERSION_GPG}.tar.bz2"
 
-if [[ ${PV} == 9999* ]]
-then
-	EGIT_REPO_URI="git://github.com/pendor/genkernel-zfs.git"
-	EGIT_BRANCH=dracut
-	inherit git bash-completion eutils
-	S="${WORKDIR}/${PN}"
-	SRC_URI="${COMMON_URI}"
-	KEYWORDS=""
-else
-	inherit bash-completion eutils
-	SRC_URI="mirror://gentoo/${P}.tar.bz2
-		${MY_HOME}/sources/genkernel/${P}.tar.bz2
-		${COMMON_URI}"
-	# Please don't touch individual KEYWORDS.  Since this is maintained/tested by
-	# Release Engineering, it's easier for us to deal with all arches at once.
-	KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sparc ~x86"
-fi
+EGIT_REPO_URI="git://github.com/pendor/genkernel-zfs.git"
+EGIT_BRANCH=dracut
+inherit git bash-completion eutils
+S="${WORKDIR}/${PN}"
+SRC_URI="${COMMON_URI}"
+KEYWORDS=""
 
 DESCRIPTION="Gentoo automatic kernel building scripts"
 HOMEPAGE="http://www.gentoo.org"
@@ -63,28 +49,14 @@ SLOT="0"
 RESTRICT=""
 IUSE="ibm selinux zfs"
 
-DEPEND="sys-fs/e2fsprogs
+DEPEND="sys-fs/e2fsprogs app-text/asciidoc
 	selinux? ( sys-libs/libselinux )
-	zfs? ( >=sys-devel/spl-0.6.0_rc5 >=sys-fs/zfs-0.6.0_rc5 )"
+	zfs? ( >=sys-kernel/spl-0.6.0_rc5 >=sys-fs/zfs-0.6.0_rc5 )"
 RDEPEND="${DEPEND} app-arch/cpio sys-kernel/dracut"
 
-if [[ ${PV} == 9999* ]]; then
-	DEPEND="${DEPEND} app-text/asciidoc"
-fi
-
 src_unpack() {
-	if [[ ${PV} == 9999* ]] ; then
-		git_src_unpack
-	else
-		unpack ${P}.tar.bz2
-	fi
+	git_src_unpack
 	use selinux && sed -i 's/###//g' "${S}"/gen_compile.sh
-}
-
-src_compile() {
-if [[ ${PV} == 9999* ]]; then
-		emake || die
-fi
 }
 
 src_install() {
