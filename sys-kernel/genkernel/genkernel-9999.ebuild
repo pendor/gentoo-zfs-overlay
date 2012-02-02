@@ -36,7 +36,7 @@ COMMON_URI="${DM_HOME}/dmraid-${VERSION_DMRAID}.tar.bz2
 
 EGIT_REPO_URI="git://github.com/pendor/genkernel-zfs.git"
 EGIT_BRANCH=dracut
-inherit git bash-completion eutils
+inherit git-2 bash-completion eutils
 S="${WORKDIR}/${PN}"
 SRC_URI="${COMMON_URI}"
 KEYWORDS=""
