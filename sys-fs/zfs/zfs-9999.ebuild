@@ -59,6 +59,8 @@ src_configure() {
 		--with-spl-obj=/usr/include/spl/module
 		--libexecdir=/usr/libexec
 		--with-udevdir=/lib/udev
+		--bindir=/bin
+		--sbindir=/sbin
 	)
 	autotools-utils_src_configure
 }
