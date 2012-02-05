@@ -57,6 +57,7 @@ src_configure() {
 		--with-spl-obj=/usr/include/spl/module
 		--libexecdir=/usr/libexec
 		--with-udevdir=/lib/udev
+		--exec-prefix=/
 		--libdir=/$(get_libdir)
 		--bindir=/bin
 		--sbindir=/sbin
