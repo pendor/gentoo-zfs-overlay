@@ -1,0 +1,51 @@
+diff --git a/config/user-dracut.m4 b/config/user-dracut.m4
+new file mode 100644
+index 0000000..220cd58
+--- /dev/null
++++ b/config/user-dracut.m4
+@@ -0,0 +1,19 @@
++AC_DEFUN([ZFS_AC_CONFIG_USER_DRACUT], [
++	AC_ARG_WITH(dracutdir,
++		AC_HELP_STRING([--with-dracutdir=DIR],
++		[directory containing dracut modules.d [[DATADIR/dracut]]]),
++		dracutdir=$withval)
++
++	AC_PATH_PROG(HAVE_DRACUT, dracut)
++	AS_IF([test "x$HAVE_DRACUT" != "x" -a "x$dracutdir" = "x"],
++	[
++		AC_PROG_SED
++		AC_PROG_GREP
++		AC_MSG_CHECKING([for Dracut modules.d location])
++		dracutdir=`$GREP 'dracutbasedir=/' $HAVE_DRACUT | head -n1 | $SED -e 's/.*dracutbasedir=\(.*\)$/\1/'`
++		AC_MSG_RESULT([$dracutdir])
++
++	])
++	AC_SUBST(dracutdir)
++	AM_CONDITIONAL(INSTALL_DRACUT, test "x$dracutdir" != "x")
++])
+diff --git a/config/user.m4 b/config/user.m4
+index 4fcef3d..aa92d19 100644
+--- a/config/user.m4
++++ b/config/user.m4
+@@ -11,4 +11,5 @@ AC_DEFUN([ZFS_AC_CONFIG_USER], [
+ 	ZFS_AC_CONFIG_USER_LIBSELINUX
+ 	ZFS_AC_CONFIG_USER_FRAME_LARGER_THAN
+ 	ZFS_AC_CONFIG_USER_STACK_GUARD
++	ZFS_AC_CONFIG_USER_DRACUT
+ ])
+diff --git a/dracut/90zfs/Makefile.am b/dracut/90zfs/Makefile.am
+index 4112061..7dc1b56 100644
+--- a/dracut/90zfs/Makefile.am
++++ b/dracut/90zfs/Makefile.am
+@@ -1,4 +1,5 @@
+-pkgdracutdir = $(datadir)/dracut/modules.d/90zfs
++if INSTALL_DRACUT
++pkgdracutdir = $(dracutdir)/modules.d/90zfs
+ pkgdracut_SCRIPTS = \
+ 	$(top_srcdir)/dracut/90zfs/module-setup.sh \
+ 	$(top_srcdir)/dracut/90zfs/mount-zfs.sh \
+@@ -19,3 +20,4 @@ $(pkgdracut_SCRIPTS):
+ 
+ distclean-local::
+ 	-$(RM) $(pkgdracut_SCRIPTS)
++endif

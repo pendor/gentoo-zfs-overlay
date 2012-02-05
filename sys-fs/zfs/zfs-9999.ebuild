@@ -42,10 +42,8 @@ src_prepare() {
 	find ${S} -name Makefile.am -exec \
 		sed -i "s:/usr/src/zfs-\\\$(ZFS_META_VERSION)-\\\$(ZFS_META_RELEASE)/\\\$(LINUX_VERSION):\\\${includedir}/zfs-linux/:g" "{}" \;
 	
-	# Fix install dir for Dracut modules
-	einfo "Fixing Dracut module install directory"
-	sed -i "s:\\\$(datadir)/dracut/:${EPREFIX}/usr/lib/dracut/:" \
-		"${S}"/dracut/90zfs/Makefile.am || die
+	# Detect install dir for Dracut modules
+	epatch "${FILESDIR}"/${PN}-9999-dracut-location.patch
 	eautoreconf
 }
 
