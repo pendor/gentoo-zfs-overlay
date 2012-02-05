@@ -4,7 +4,7 @@
 
 EAPI="4"
 
-inherit git-2 linux-mod autotools-utils
+inherit git-2 linux-mod autotools-utils multilib
 
 DESCRIPTION="Native ZFS for Linux"
 HOMEPAGE="http://zfsonlinux.org/"
@@ -57,6 +57,7 @@ src_configure() {
 		--with-spl-obj=/usr/include/spl/module
 		--libexecdir=/usr/libexec
 		--with-udevdir=/lib/udev
+		--libdir=/$(get_libdir)
 		--bindir=/bin
 		--sbindir=/sbin
 	)
