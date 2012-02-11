@@ -1,0 +1,13 @@
+diff -ruw dracut-014-orig/modules.d/90kernel-modules/module-setup.sh dracut-014/modules.d/90kernel-modules/module-setup.sh
+--- dracut-014-orig/modules.d/90kernel-modules/module-setup.sh	2011-12-15 03:19:05.000000000 -0500
++++ dracut-014/modules.d/90kernel-modules/module-setup.sh	2012-01-28 12:49:35.000000000 -0500
+@@ -50,7 +50,8 @@
+                 rm -fr ${initdir}/lib/modules/*/kernel/fs/ocfs2
+             fi
+         else
+-            hostonly='' instmods $(get_fs_type "/dev/block/$(find_root_block_device)")
++            local foundMods=$(get_fs_type "/dev/block/$(find_root_block_device)")
++            [ x$foundMods = x ] || hostonly='' instmods $foundMods
+         fi
+     else
+         hostonly='' instmods $drivers
