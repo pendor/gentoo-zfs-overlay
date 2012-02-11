@@ -134,7 +134,6 @@ base_sys_maj_ver() {
 
 src_prepare() {
 	epatch "${FILESDIR}/${P}-multipath-udev-rules.patch"
-	epatch "${FILESDIR}/${P}-usrmount-fsck-fix.patch"
 	#epatch "${FILESDIR}/${P}-zfs-hostonly-hang.patch"
 }
 
