@@ -46,6 +46,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/${MY_P}-020-zfs_update.patch
 	epatch "${FILESDIR}"/${MY_P}-029-noman.patch
 	epatch "${FILESDIR}"/${MY_P}-030-zfs_gentoo_build.patch
+	epatch "${FILESDIR}"/${MY_P}-031-pkglibdir-automake.patch
 	epatch_user
 
 	# autogen.sh does more than just run autotools
