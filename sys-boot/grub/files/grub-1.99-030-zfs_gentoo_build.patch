@@ -44,6 +44,18 @@ diff -ruw grub-1.99/configure.ac grub-1.99-patched/configure.ac
 +AC_CHECK_FUNCS(getextmntent)
  
  LIBS=""
+
+diff -ruw grub-1.99/configure.ac grub-1.99-patched/configure.ac
+--- grub-1.99/configure.ac	2014-01-20 14:26:59.000000000 -0500
++++ grub/1.99-patchers/configure.ac	2014-01-20 14:32:57.936646884 -0500
+@@ -262,6 +262,7 @@
+ 
+ AC_GNU_SOURCE
+ AM_GNU_GETTEXT([external])
++AM_GNU_GETTEXT_VERSION(0.18.2)
+ AC_SYS_LARGEFILE
+ 
+ # Identify characteristics of the host architecture.
  
 diff -ruw grub-1.99/grub-core/kern/emu/getroot.c grub-1.99-patched/grub-core/kern/emu/getroot.c
 --- grub-1.99/grub-core/kern/emu/getroot.c	2011-04-25 13:11:52.000000000 +0000
