@@ -1,9 +1,10 @@
-diff --git a/ChangeLog b/ChangeLog
-index 016056a..cf5d822 100644
---- a/ChangeLog
-+++ b/ChangeLog
-@@ -1,3 +1,17 @@
-+2011-12-24  Keshav P R  <address@hidden>
+diff --git a/ChangeLog_Keshav b/ChangeLog_Keshav
+new file mode 100644
+index 0000000..0eafd65
+--- /dev/null
++++ b/ChangeLog_Keshav
+@@ -0,0 +1,12 @@
++2012-01-04  Keshav P R  <the.ridikulus.rat@gmail.com>
 +
 +	Fixes for automake 1.11.2
 +
@@ -15,11 +16,6 @@ index 016056a..cf5d822 100644
 +	* util/grub-mknetdir.in: Likewise.
 +	* util/grub-mkrescue.in: Likewise.
 +	* util/grub-mkstandalone.in: Likewise.
-+
-+
- 2011-12-24  Vladimir Serbinenko  <address@hidden>
- 
- 	Integrate hints into autogeneration scripts.
 diff --git a/Makefile.am b/Makefile.am
 index c5f486e..395b0dd 100644
 --- a/Makefile.am
@@ -74,10 +70,10 @@ diff --git a/util/grub-mknetdir.in b/util/grub-mknetdir.in
 index e5a2172..7f6a36d 100644
 --- a/util/grub-mknetdir.in
 +++ b/util/grub-mknetdir.in
-@@ -30,7 +30,7 @@ address@hidden@
- address@hidden@
- address@hidden@/locale
- address@hidden@
+@@ -30,7 +30,7 @@ PACKAGE_VERSION=@PACKAGE_VERSION@
+ host_os=@host_os@
+ localedir=@datadir@/locale
+ datarootdir=@datarootdir@
 -pkglib_DATA="moddep.lst command.lst fs.lst partmap.lst parttool.lst handler.lst video.lst crypto.lst terminal.lst"
 +pkgdata_DATA="moddep.lst command.lst fs.lst partmap.lst parttool.lst handler.lst video.lst crypto.lst terminal.lst"
  
@@ -96,10 +92,10 @@ diff --git a/util/grub-mkrescue.in b/util/grub-mkrescue.in
 index eff7708..f6b96d4 100644
 --- a/util/grub-mkrescue.in
 +++ b/util/grub-mkrescue.in
-@@ -27,7 +27,7 @@ address@hidden@
- address@hidden@
- address@hidden@
- address@hidden@
+@@ -27,7 +27,7 @@ libdir=@libdir@
+ PACKAGE_NAME=@PACKAGE_NAME@
+ PACKAGE_TARNAME=@PACKAGE_TARNAME@
+ PACKAGE_VERSION=@PACKAGE_VERSION@
 -pkglib_DATA="moddep.lst command.lst fs.lst partmap.lst parttool.lst handler.lst video.lst crypto.lst terminal.lst"
 +pkgdata_DATA="moddep.lst command.lst fs.lst partmap.lst parttool.lst handler.lst video.lst crypto.lst terminal.lst"
  
@@ -118,10 +114,10 @@ diff --git a/util/grub-mkstandalone.in b/util/grub-mkstandalone.in
 index b0dbf9b..92b7306 100644
 --- a/util/grub-mkstandalone.in
 +++ b/util/grub-mkstandalone.in
-@@ -27,7 +27,7 @@ address@hidden@
- address@hidden@
- address@hidden@
- address@hidden@
+@@ -27,7 +27,7 @@ libdir=@libdir@
+ PACKAGE_NAME=@PACKAGE_NAME@
+ PACKAGE_TARNAME=@PACKAGE_TARNAME@
+ PACKAGE_VERSION=@PACKAGE_VERSION@
 -pkglib_DATA="moddep.lst command.lst fs.lst partmap.lst parttool.lst handler.lst video.lst crypto.lst terminal.lst"
 +pkgdata_DATA="moddep.lst command.lst fs.lst partmap.lst parttool.lst handler.lst video.lst crypto.lst terminal.lst"
  
@@ -136,3 +132,191 @@ index b0dbf9b..92b7306 100644
      if test -f "${source_directory}/${file}"; then
          cp -f "${source_directory}/${file}" "${memdisk_dir}"/boot/grub/
      fi
+iff --git a/grub2/manjaro_grub2_mkconfig_fixes.patch b/grub2/manjaro_grub2_mkconfig_fixes.patch
+ndex 711ad78..a068374 100755
+-- a/grub2/manjaro_grub2_mkconfig_fixes.patch
+++ b/grub2/manjaro_grub2_mkconfig_fixes.patch
+@ -1,6 +1,16 @@
+diff -Nur a/util/grub.d/00_header.in b/util/grub.d/00_header.in
+--- a/util/grub.d/00_header.in	2011-04-06 13:14:27.000000000 +0200
++++ b/util/grub.d/00_header.in	2011-08-30 10:41:52.555709561 +0200
+--- a/util/grub-mkconfig.in
++++ b/util/grub-mkconfig.in
+@@ -252,6 +252,8 @@
+   GRUB_THEME \
+   GRUB_GFXPAYLOAD_LINUX \
+   GRUB_DISABLE_OS_PROBER \
++  GRUB_COLOR_NORMAL \
++  GRUB_COLOR_HIGHLIGHT \
+   GRUB_INIT_TUNE \
+   GRUB_SAVEDEFAULT \
+   GRUB_BADRAM
+--- a/util/grub.d/00_header.in
++++ b/util/grub.d/00_header.in
+@@ -100,6 +100,14 @@
+ 
+ EOF
+@ -16,91 +26,115 @@ diff -Nur a/util/grub.d/00_header.in b/util/grub.d/00_header.in
+ serial=0;
+ gfxterm=0;
+ for x in ${GRUB_TERMINAL_INPUT} ${GRUB_TERMINAL_OUTPUT}; do
+diff -Nur a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
+--- a/util/grub.d/10_linux.in	2011-05-14 22:36:49.000000000 +0200
++++ b/util/grub.d/10_linux.in	2011-08-30 16:34:10.121591666 +0200
+@@ -31,8 +31,8 @@
+ if [ "x${GRUB_DISTRIBUTOR}" = "x" ] ; then
+   OS=GNU/Linux
+ else
+-  OS="${GRUB_DISTRIBUTOR} GNU/Linux"
+-  CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | cut -d' ' -f1) ${CLASS}"
++  OS="${GRUB_DISTRIBUTOR}"
++  CLASS="--class $(echo ${GRUB_DISTRIBUTOR} | tr 'A-Z' 'a-z' | tr -d ' ') ${CLASS}"
+ fi
+ 
+ # loop-AES arranges things so that /dev/loop/X can be our root device, but
+@@ -65,7 +65,9 @@
+   version="$2"
+   recovery="$3"
+   args="$4"
+-  if ${recovery} ; then
++  if [ -n "$5" ] ; then
++    title="$(gettext_quoted "%s, with Linux %s") $5"
++  elif ${recovery} ; then
+     title="$(gettext_quoted "%s, with Linux %s (recovery mode)")"
+--- a/util/grub.d/10_linux.in
++++ b/util/grub.d/10_linux.in
+@@ -87,6 +87,8 @@ linux_entry ()
+       case $type in
+ 	  recovery)
+ 	      title="$(gettext_printf "%s, with Linux %s (recovery mode)" "${os}" "${version}")" ;;
++	  fallback)
++	      title="$(gettext_printf "%s, with Linux %s (Fallback initramfs)" "${os}" "${version}")" ;;
+ 	  *)
+ 	      title="$(gettext_printf "%s, with Linux %s" "${os}" "${version}")" ;;
+       esac
+@@ -100,7 +102,7 @@ linux_entry ()
+   else
+     title="$(gettext_quoted "%s, with Linux %s")"
+@@ -113,15 +115,11 @@
+       echo "menuentry '$(echo "$os" | grub_quote)' ${CLASS} \$menuentry_id_option 'gnulinux-simple-$boot_device_id' {" | sed "s/^/$submenu_indentation/"
+   fi      
+-  if [ x$type != xrecovery ] ; then
++  if [ x$type != xrecovery ] && [ x$type != xfallback ] ; then
+       save_default_entry | sed -e "s/^/\t/"
+   fi
+ 
+@@ -132,7 +134,8 @@ linux_entry ()
+     fi
+     printf '%s\n' "${prepare_boot_cache}"
+     printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
+   fi
+-  message="$(gettext_printf "Loading Linux %s ..." ${version})"
+   cat << EOF
+-	echo	'$message'
++
++  message="$(gettext_printf "Loading Linux %s ..." "${version}")"
+   sed "s/^/$submenu_indentation/" << EOF
+ 	echo	'$message'
+ 	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} ro ${args}
+ EOF
+   if test -n "${initrd}" ; then
+-    message="$(gettext_printf "Loading initial ramdisk ...")"
+     cat << EOF
+-	echo	'$message'
+ 	initrd	${rel_dirname}/${initrd}
+ EOF
+   fi
+@@ -132,7 +130,7 @@
+@@ -190,7 +193,21 @@ while [ "x$list" != "x" ] ; do
+   alt_version=`echo $version | sed -e "s,\.old$,,g"`
+   linux_root_device_thisversion="${LINUX_ROOT_DEVICE}"
+ 
+ case x`uname -m` in
+     xi?86 | xx86_64)
+-	list=`for i in /boot/vmlinuz-* /vmlinuz-* /boot/kernel-* ; do
++	list=`for i in /boot/vmlinuz-* /vmlinuz-* /boot/kernel-* /boot/vmlinuz26-* ; do
+                   if grub_file_is_not_garbage "$i" ; then echo -n "$i " ; fi
+               done` ;;
+     *) 
+@@ -160,7 +158,8 @@
++  if test -e "/etc/manjaro-release" ; then
++    if echo "${basename}" | grep -q 'vmlinuz-linux' ; then
++      version="`echo "${basename}" | sed -e 's,vmlinuz-linux,,g'`"
++
++      if [ "x${version}" = "x" ] ; then
++        version="core repo kernel"
++      else
++        version="`echo "${version}" | sed -e 's,-,,g'`"
++        version="${version} kernel"
++      fi
++    fi
++  fi
++
+   initrd=
++  initrd_manjaro="`echo "${basename}" | sed -e 's,vmlinuz,initramfs,g'`"
+   for i in "initrd.img-${version}" "initrd-${version}.img" "initrd-${version}.gz" \
+ 	   "initrd-${version}" "initramfs-${version}.img" \
+ 	   "initrd.img-${alt_version}" "initrd-${alt_version}.img" \
+ 	   "initrd-${alt_version}" "initramfs-${alt_version}.img" \
+@@ -198,7 +215,8 @@ while [ "x$list" != "x" ] ; do
+ 	   "initramfs-genkernel-${version}" \
+-	   "initramfs-genkernel-${alt_version}"; do
++	   "initramfs-genkernel-${alt_version}" \
++	   "${basename/vmlinuz/initramfs}.img" "${basename/vmlinuz/kernel}.img"; do
+ 	   "initramfs-genkernel-${alt_version}" \
+ 	   "initramfs-genkernel-${GENKERNEL_ARCH}-${version}" \
+-	   "initramfs-genkernel-${GENKERNEL_ARCH}-${alt_version}"; do
++	   "initramfs-genkernel-${GENKERNEL_ARCH}-${alt_version}" \
++           "${initrd_manjaro}.img" ; do
+     if test -e "${dirname}/${i}" ; then
+       initrd="$i"
+       break
+@@ -190,6 +189,15 @@
+@@ -226,6 +244,22 @@ while [ "x$list" != "x" ] ; do
+     linux_root_device_thisversion=${GRUB_DEVICE}
+   fi
+ 
+   linux_entry "${OS}" "${version}" false \
+       "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++  for i in "initramfs-${version}-fallback.img" \
++	   "${basename/vmlinuz/initramfs}-fallback.img" "${basename/vmlinuz/kernel}-fallback.img"; do
++    if test -e "${dirname}/${i}"; then
++      initrd="$i"
++      linux_entry "${OS}" "${version}" true \
++	  "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}" Fallback
++      break
++    fi
++  done
++  if test -e "/etc/manjaro-release" ; then
++    is_first_entry="false"
++
++    linux_entry "${OS}" "${version}" true \
++              "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++
++    for i in "${initrd_manjaro}-fallback.img" "initramfs-${version}-fallback.img" ; do
++      if test -e "${dirname}/${i}" ; then
++        initrd="${i}"
++        linux_entry "${OS}" "${version}" fallback \
++                    "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++        break
++      fi
++    done
++  fi
++
+   if [ "x$is_first_entry" = xtrue ]; then
+     linux_entry "${OS}" "${version}" simple \
+     "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
+@@ -239,8 +273,11 @@ while [ "x$list" != "x" ] ; do
+     echo "submenu '$(gettext_printf "Advanced options for %s" "${OS}" | grub_quote)' \$menuentry_id_option 'gnulinux-advanced-$boot_device_id' {"
+   fi
+ 
+-  linux_entry "${OS}" "${version}" advanced \
+-              "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++  if ! test -e "/etc/manjaro-release" ; then 
++    linux_entry "${OS}" "${version}" advanced \
++                "${GRUB_CMDLINE_LINUX} ${GRUB_CMDLINE_LINUX_DEFAULT}"
++  fi
++
+   if [ "x${GRUB_DISABLE_RECOVERY}" != "xtrue" ]; then
+     linux_entry "${OS}" "${version}" true \
+ 	"single ${GRUB_CMDLINE_LINUX}"
